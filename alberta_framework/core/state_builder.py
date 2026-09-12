@@ -70,6 +70,7 @@ from alberta_framework.core.working_memory import (
 )
 
 _INT32_MAX = 2**31 - 1
+_MAX_FIXED_TRACE_DECAY_RATES = 1 << 12  # 4096
 _ACTUAL_INT_TYPES = frozenset({int, *(np.dtype(code).type for code in "bBhHiIlLqQpP")})
 
 
@@ -104,6 +105,8 @@ def _require_int32(name: str, value: object, *, minimum: int) -> int:
 def _require_decay_rates(name: str, value: object) -> tuple[float, ...]:
     if type(value) is not tuple:
         raise ValueError(f"{name} must be an actual tuple")
+    if len(value) > _MAX_FIXED_TRACE_DECAY_RATES:
+        raise ValueError(f"{name} must contain at most {_MAX_FIXED_TRACE_DECAY_RATES} decay rates")
     rates = cast(tuple[object, ...], value)
     return tuple(
         validated_float32_scalar(
@@ -1028,6 +1031,16 @@ class FixedTraceStateBuilderConfig:
             or type(out_decays) not in (list, tuple)
         ):
             raise ValueError("decay rates must be lists or tuples")
+        for name, value in (
+            ("observation_decay_rates", obs_decays),
+            ("action_decay_rates", act_decays),
+            ("outcome_decay_rates", out_decays),
+        ):
+            if len(value) > _MAX_FIXED_TRACE_DECAY_RATES:
+                raise ValueError(
+                    f"{name} must contain at most "
+                    f"{_MAX_FIXED_TRACE_DECAY_RATES} decay rates"
+                )
         return cls(
             observation_dim=data["observation_dim"],
             n_actions=data["n_actions"],
