@@ -1037,7 +1037,10 @@ class FixedTraceStateBuilderConfig:
             ("outcome_decay_rates", out_decays),
         ):
             if len(value) > _MAX_FIXED_TRACE_DECAY_RATES:
-                raise ValueError(f"{name} must contain at most {_MAX_FIXED_TRACE_DECAY_RATES} decay rates")
+                raise ValueError(
+                    f"{name} must contain at most "
+                    f"{_MAX_FIXED_TRACE_DECAY_RATES} decay rates"
+                )
         return cls(
             observation_dim=data["observation_dim"],
             n_actions=data["n_actions"],

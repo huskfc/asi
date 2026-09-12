@@ -4,19 +4,19 @@ from __future__ import annotations
 
 import pytest
 
+from alberta_framework.core.state_builder import FixedTraceStateBuilderConfig
 from alberta_framework.core.working_memory import (
     WorkingMemoryConfig,
     WorkingMemoryFeaturizer,
 )
-from alberta_framework.core.state_builder import FixedTraceStateBuilderConfig
 
 
 class _HostileList(list):
     """List subclass with hostile __len__ and __iter__ hooks."""
-    
+
     def __len__(self) -> int:
         raise RuntimeError("hostile __len__ must not run")
-    
+
     def __iter__(self):
         raise RuntimeError("hostile __iter__ must not run")
 
@@ -48,7 +48,7 @@ def _base_fixed_trace_cfg(**overrides):
 
 @pytest.mark.parametrize("decay_field", [
     "observation_decay_rates",
-    "action_decay_rates", 
+    "action_decay_rates",
     "reward_decay_rates",
 ])
 def test_working_memory_rejects_oversized_decay_rates_tuple(decay_field):
@@ -79,14 +79,14 @@ def test_working_memory_from_config_rejects_oversized_list(decay_field):
     cfg = _base_wm_cfg(**{decay_field: (0.5, 0.9)})
     serialized = cfg.to_config()
     serialized[decay_field] = [0.5] * 4097  # oversized list
-    
+
     with pytest.raises(ValueError, match="at most 4096 decay rates"):
         WorkingMemoryConfig.from_config(serialized)
 
 
 @pytest.mark.parametrize("decay_field", [
     "observation_decay_rates",
-    "action_decay_rates", 
+    "action_decay_rates",
     "reward_decay_rates",
 ])
 def test_working_memory_from_config_rejects_hostile_list_subclass(decay_field):
@@ -94,7 +94,7 @@ def test_working_memory_from_config_rejects_hostile_list_subclass(decay_field):
     cfg = _base_wm_cfg(**{decay_field: (0.5, 0.9)})
     serialized = cfg.to_config()
     serialized[decay_field] = _HostileList([0.5, 0.9])  # hostile subclass
-    
+
     with pytest.raises(ValueError, match="must be an actual list or tuple"):
         WorkingMemoryConfig.from_config(serialized)
 
@@ -109,7 +109,7 @@ def test_working_memory_from_config_accepts_valid_list(decay_field):
     cfg = _base_wm_cfg(**{decay_field: (0.5, 0.9)})
     serialized = cfg.to_config()
     serialized[decay_field] = [0.5, 0.9, 0.99]  # valid list
-    
+
     restored = WorkingMemoryConfig.from_config(serialized)
     assert restored is not None
 
@@ -150,7 +150,7 @@ def test_fixed_trace_from_config_rejects_oversized_list(decay_field):
     cfg = _base_fixed_trace_cfg(**{decay_field: (0.5, 0.9)})
     serialized = cfg.to_config()
     serialized[decay_field] = [0.5] * 4097  # oversized list
-    
+
     with pytest.raises(ValueError, match="at most 4096 decay rates"):
         FixedTraceStateBuilderConfig.from_config(serialized)
 
@@ -165,7 +165,7 @@ def test_fixed_trace_from_config_rejects_hostile_list_subclass(decay_field):
     cfg = _base_fixed_trace_cfg(**{decay_field: (0.5, 0.9)})
     serialized = cfg.to_config()
     serialized[decay_field] = _HostileList([0.5, 0.9])  # hostile subclass
-    
+
     with pytest.raises(ValueError, match="decay rates must be lists or tuples"):
         FixedTraceStateBuilderConfig.from_config(serialized)
 
