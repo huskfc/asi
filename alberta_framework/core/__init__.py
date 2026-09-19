@@ -1057,3 +1057,16 @@ __all__ = [
     "load_prototype_feature_lifecycle_checkpoint",
     "save_prototype_feature_lifecycle_checkpoint",
 ]
+
+# Safe softmax utilities (immune to XLA recomputation NaN)
+from alberta_framework.core._safe_softmax import (
+    safe_softmax,
+    safe_log_softmax,
+    safe_softmax_with_logits,
+)
+
+__all__ = list(__all__) + [
+    "safe_softmax",
+    "safe_log_softmax",
+    "safe_softmax_with_logits",
+]
