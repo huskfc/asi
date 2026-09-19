@@ -33,7 +33,9 @@ def safe_log_softmax(logits: jax.Array, temperature: float = 1.0) -> jax.Array:
     return jax.nn.log_softmax(scaled_centered)
 
 
-def safe_softmax_with_logits(logits: jax.Array, temperature: float = 1.0) -> tuple[jax.Array, jax.Array]:
+def safe_softmax_with_logits(
+    logits: jax.Array, temperature: float = 1.0
+) -> tuple[jax.Array, jax.Array]:
     """Return (probs, log_probs) both computed with double-centering."""
     centered = logits - jax.lax.stop_gradient(jnp.max(logits, axis=-1, keepdims=True))
     scaled = centered / temperature

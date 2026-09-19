@@ -1060,8 +1060,8 @@ __all__ = [
 
 # Safe softmax utilities (immune to XLA recomputation NaN)
 from alberta_framework.core._safe_softmax import (
-    safe_softmax,
     safe_log_softmax,
+    safe_softmax,
     safe_softmax_with_logits,
 )
 
